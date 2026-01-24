@@ -1,7 +1,4 @@
-<h2>AI Learning Feedback</h2>
-
-<p><strong>Confidence Score:</strong> {{ confidence }}</p>
-
-<pre>{{ transcript }}</pre>
-
-<a href="/submit/">Submit another</a>
+<h2>AI Feedback</h2>
+<p>{{ transcript }}</p>
+<p>Confidence: {{ confidence }}%</p>
+<a href="{% url 'user_activity' %}">Submit another</a>

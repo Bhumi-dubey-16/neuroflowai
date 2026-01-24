@@ -1,44 +1,47 @@
-# ai_engine/ai_module.py
-
-def generate_ai_response(user_text):
+def generate_ai_response(user_text, difficulty=2):
     """
     Safe AI feedback generator.
-    Always returns feedback + confidence.
-    Never crashes (hackathon-safe).
+    Always returns feedback + confidence + bullets.
     """
 
-    # Fallback defaults (VERY IMPORTANT)
     default_feedback = (
         "Good effort! You are on the right track. "
         "Try to explain your ideas more clearly and confidently."
     )
     default_confidence = 60
+    default_bullets = [
+        "Keep trying to explain clearly",
+        "Break down complex ideas",
+        "Focus on key points"
+    ]
 
     try:
-        # ---- MOCK / PLACEHOLDER AI LOGIC ----
-        # (Replace later with Gemini / OpenAI if needed)
-
         word_count = len(user_text.split()) if user_text else 0
 
-        if word_count < 10:
-            feedback = "Try to give a slightly more detailed response."
-            confidence = 40
-        elif word_count < 30:
-            feedback = "Nice attempt. Your understanding is developing well."
-            confidence = 65
-        else:
-            feedback = "Excellent explanation! You showed strong understanding."
-            confidence = 85
+        if difficulty == 1:  # Easy
+            feedback = "Simplified explanation: focus on basics."
+            confidence = 50 + min(word_count, 50)
+        elif difficulty == 2:  # Medium
+            feedback = "Medium explanation: adds some details."
+            confidence = 60 + min(word_count, 40)
+        else:  # Advanced
+            feedback = "Advanced explanation: detailed & thorough."
+            confidence = 70 + min(word_count, 30)
+
+        bullets = [
+            f"Key idea {i+1}" for i in range(3)
+        ]
 
         return {
             "feedback": feedback,
-            "confidence": confidence
+            "confidence": confidence,
+            "bullets": bullets
         }
 
     except Exception as e:
-        # 🔒 Absolute safety net
         print("AI Error:", e)
         return {
             "feedback": default_feedback,
-            "confidence": default_confidence
+            "confidence": default_confidence,
+            "bullets": default_bullets
         }

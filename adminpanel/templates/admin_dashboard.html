@@ -3,110 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <title>Admin Dashboard</title>
-
-    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 30px;
-        }
-        h1, h2 {
-            margin-top: 30px;
-        }
-        .stats {
-            display: flex;
-            gap: 40px;
-            margin-top: 20px;
-        }
-        .card {
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            width: 200px;
-            text-align: center;
-        }
-        canvas {
-            margin-top: 30px;
-            max-width: 600px;
-        }
-        a {
-            display: inline-block;
-            margin-top: 20px;
-        }
-        ul {
-            margin-top: 15px;
-        }
+        body { font-family: Arial, sans-serif; padding: 30px; }
+        h1, h2 { margin-bottom: 15px; }
+        a { display: inline-block; margin: 10px 0; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+        canvas { margin-top: 25px; }
     </style>
 </head>
-
 <body>
 
 <h1>Admin Dashboard</h1>
 
-<!-- ===== Stats Cards ===== -->
-<div class="stats">
-    <div class="card">
-        <h3>Total Responses</h3>
-        <p>{{ total_responses }}</p>
-    </div>
+<p><strong>Total Responses:</strong> {{ total_responses }}</p>
+<p><strong>Average Confidence:</strong> {{ avg_confidence }}%</p>
 
-    <div class="card">
-        <h3>Average Confidence</h3>
-        <p>{{ avg_confidence }}%</p>
-    </div>
-</div>
+<a href="{% url 'export_responses_csv' %}">Download CSV</a>
 
-<a href="{% url 'export_responses_csv' %}">⬇ Download CSV</a>
-
-<!-- ===== Chart Section ===== -->
-<h2>Confidence Analytics</h2>
-<canvas id="confidenceChart"></canvas>
-
-<!-- ===== Recent Responses ===== -->
-<h2>All Responses</h2>
-<ul>
-    {% for r in responses %}
-        <li>
-            {{ r.user.email }} —
-            {{ r.transcript }} —
-            {{ r.confidence_score }}%
-        </li>
-    {% endfor %}
-</ul>
-
-<!-- ===== Analytics API (for debugging/demo) ===== -->
-<h2>Analytics API Output</h2>
+<h2>Learning Analytics</h2>
 <pre id="analytics-output">Loading analytics...</pre>
 
-<!-- ===== JavaScript ===== -->
+<h2>All Responses</h2>
+<table>
+    <thead>
+        <tr>
+            <th>User</th>
+            <th>Transcript / Feedback</th>
+            <th>Confidence (%)</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for r in responses %}
+        <tr>
+            <td>{{ r.user.email if r.user else "Unknown" }}</td>
+            <td>{{ r.transcript }}</td>
+            <td>{{ r.confidence_score }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<h2>Analytics Charts</h2>
+<canvas id="confidenceChart" width="400" height="200"></canvas>
+
 <script>
-/* -------------------------------
-   Confidence Chart from Backend
--------------------------------- */
-fetch("/dashboard/api/analytics/")
-  .then(response => response.json())
-  .then(data => {
-
-    const labels = data.confidence_scores.map(
-        (item, index) => "Response " + (index + 1)
-    );
-
-    const scores = data.confidence_scores.map(
-        item => item.confidence
-    );
-
-    const ctx = document.getElementById("confidenceChart").getContext("2d");
+    // Confidence per user chart
+    const ctx = document.getElementById('confidenceChart').getContext('2d');
+    const labels = [{% for r in responses %}'{{ r.user.email if r.user else "Unknown" }}',{% endfor %}];
+    const dataPoints = [{% for r in responses %}{{ r.confidence_score }},{% endfor %}];
 
     new Chart(ctx, {
-        type: "bar",
+        type: 'bar',
         data: {
             labels: labels,
             datasets: [{
-                label: "Confidence Score (%)",
-                data: scores,
-                backgroundColor: "rgba(99, 102, 241, 0.6)"
+                label: 'Confidence (%)',
+                data: dataPoints,
+                backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
             }]
         },
         options: {
@@ -120,15 +77,17 @@ fetch("/dashboard/api/analytics/")
         }
     });
 
-    // Show raw JSON (hackathon demo friendly)
-    document.getElementById("analytics-output").textContent =
-        JSON.stringify(data, null, 2);
-  })
-  .catch(error => {
-    document.getElementById("analytics-output").textContent =
-        "Error loading analytics";
-    console.error(error);
-  });
+    // Fetch Analytics API
+    fetch("{% url 'analytics_api' %}")
+    .then(res => res.json())
+    .then(data => {
+        document.getElementById("analytics-output").textContent = 
+            JSON.stringify(data, null, 2);
+    })
+    .catch(err => {
+        console.error(err);
+        document.getElementById("analytics-output").textContent = "Error loading analytics";
+    });
 </script>
 
 </body>
