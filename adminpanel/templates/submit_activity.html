@@ -1,0 +1,9 @@
+<h2>Submit Learning Content</h2>
+
+<form method="POST">
+    {% csrf_token %}
+    <textarea name="content" rows="8" cols="60"
+        placeholder="Paste or type learning content here..."
+        required></textarea><br><br>
+    <button type="submit">Submit</button>
+</form>

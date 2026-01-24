@@ -1,0 +1,14 @@
+<h1>Admin Dashboard</h1>
+
+<p>Total Users: {{ total_users }}</p>
+<p>Total Responses: {{ total_responses }}</p>
+<p>Average Confidence: {{ avg_confidence }}</p>
+
+<h3>Responses per User</h3>
+<ul>
+{% for item in responses_per_user %}
+  <li>User ID {{ item.user }} — {{ item.count }}</li>
+{% endfor %}
+</ul>
+
+<a href="{% url 'export_csv' %}">Export CSV</a>
