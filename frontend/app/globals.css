@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 
+  Accessibility-first design system
+  - Soft colors to reduce visual stress
+  - High contrast for readability
+  - Comfortable spacing for focus
+*/
+
+@layer base {
+  body {
+    @apply bg-gray-50 text-gray-800;
+    /* Off-white background reduces eye strain */
+    /* Dark gray text (not pure black) is easier on the eyes */
+  }
+}
+
+/* 
+  Custom utility classes for consistent spacing
+  Following 8px spacing system for visual rhythm
+*/
+@layer utilities {
+  .spacing-section {
+    @apply py-16 px-4 sm:px-6 lg:px-8;
+    /* Large vertical spacing for breathing room */
+  }
+  
+  .spacing-container {
+    @apply max-w-7xl mx-auto;
+    /* Centered container with max width for readability */
+  }
+}
+
+
+
+
+
+
+
+
+
